@@ -30,7 +30,7 @@
   margin-top: 300px;
   align-items: center;
   text-align: center;
-  height: 100vh;
+  height: 50%;
   width: 100vw;
 }
 
@@ -38,3 +38,30 @@
   padding: 7px;
   color: #293264;
 }
+
+/* .form{
+  display: flex;
+  float: left;
+  margin: 0 5px 0 0;
+  width: 100px;
+  height: 40px;
+  position: relative;
+}
+
+
+.form input[type="radio"] {
+  opacity: 0.011;
+  z-index: 100;
+}
+
+.form input[type="radio"]:checked + label {
+  background: #20b8be;
+  border-radius: 4px;
+}
+
+.form label {
+  cursor: pointer;
+  z-index: 90;
+  line-height: 1.8em;
+} */
+
