@@ -4,21 +4,51 @@ import {nanoid} from "nanoid";
 export default function Quiz(){
     
     const [questions, setQuestions] = React.useState([]);
+    const [form, setForm] = React.useState([]);
 
     React.useEffect(() => {
         async function getQuestions(){
-            const result = await fetch("https://opentdb.com/api.php?amount=50&category=9&type=multiple");
+            const result = await fetch("https://opentdb.com/api.php?amount=5&category=9&type=multiple");
             const data = await result.json();
             
             if(data.response_code != 0){
                 console.log("API call error!");
                 return;
             }
-            
-            setQuestions(data.results);
-        }
+
+            let formData = [];
+            data.results.forEach(q => {
+                const correctAnswer = q.correct_answer;
+                let answer = [...q.incorrect_answers, correctAnswer];
+                shuffleAnswers(answer);
+                q.incorrect_answers = answer;
+
+                let answerID = 0;
+                for(let i = 0; i < 4; ++i){
+                    if(answer[i] === correctAnswer){
+                        answerID = i;
+                        break;
+                    }
+                }
+                
+                formData.push({
+                    answer: -1,
+                    correctAnswer: answerID
+                });
+                })
+
+                setQuestions(() => data.results.map(q => ({
+                    question: q.question,
+                    answers: q.incorrect_answers
+                })));
+                setForm(formData);
+            }
+
         getQuestions();
     },[])
+
+    console.log(questions);
+    console.log(form);
 
     function shuffleAnswers(answers) {
         for (let i = answers.length - 1; i > 0; i--) {
@@ -33,66 +63,55 @@ export default function Quiz(){
         console.log(event.target.id);
     }
 
-    const mapQuestions = questions.map(q =>{
+    const handleSubmit = (event) => {
+        event.preventDefault();
+    }
+
+    const mapQuestions = questions.map((q,index) =>{
         const htmlText = {
             __html: q.question
-        }
-        const correctAnswer = q.correct_answer
-        const answers = [...q.incorrect_answers, correctAnswer]; 
-        shuffleAnswers(answers);
-
-        const answerId = 0;
-        for (let i = 0; i < answers; ++i){
-            if(correctAnswer = answers[i]){
-                answerId = i;
-                break;
-            }
         }
 
         return (
             <div key = {nanoid()}>
                 <h2 className = "question" dangerouslySetInnerHTML={htmlText}/>
-                <form action="" className = "form">
-                    <input 
-                        type="radio"
-                        id = "1" 
-                        name = {q.question}
-                        onChange = {handleChange}
-                    />
-                    <label htmlFor={q.question} dangerouslySetInnerHTML={{__html: answers[0]}}></label>
-                    
-                    <input 
-                        type="radio"
-                        id = "2"
-                        name = {q.question}
-                        onChange = {handleChange}
-                    />
-                    <label htmlFor={q.question} dangerouslySetInnerHTML={{__html: answers[1]}}></label>
-                    
-                    <input 
-                        type="radio" 
-                        id = "3"
-                        name = {q.question}
-                        onChange = {handleChange}
-                    />
-                    <label htmlFor={q.question} dangerouslySetInnerHTML={{__html: answers[2]}}></label>
-                    
-                    <input 
-                        type="radio" 
-                        id = "4"
-                        name = {q.question}
-                        onChange = {handleChange}
-                    />
-                    <label htmlFor={q.question} dangerouslySetInnerHTML={{__html: answers[3]}}></label>
-                </form>
+                <input 
+                    type="radio"
+                    id = {0} 
+                    name = {q.question}
+                    onChange = {handleChange}
+                />
+                {/* <label htmlFor={q.question} dangerouslySetInnerHTML={{__html: answers[0]}}></label> */}
+                
+                <input 
+                    type="radio"
+                    id = {1}
+                    name = {q.question}
+                    onChange = {handleChange}
+                />
+                {/* <label htmlFor={q.question} dangerouslySetInnerHTML={{__html: answers[1]}}></label> */}
+                
+                <input 
+                    type="radio" 
+                    id = {2}
+                    name = {q.question}
+                    onChange = {handleChange}
+                />
+                {/* <label htmlFor={q.question} dangerouslySetInnerHTML={{__html: answers[2]}}></label> */}
+                
+                <input 
+                    type="radio" 
+                    id = {3}
+                    name = {q.question}
+                    onChange = {handleChange}
+                />
+                {/* <label htmlFor={q.question} dangerouslySetInnerHTML={{__html: answers[3]}}></label> */}
             </div>
         )
     });
 
-    
+
     return (
-        <div>
-            {mapQuestions}
-        </div>
+        <form action="" onSubmit={handleSubmit} className = "form">{mapQuestions}</form>
     );
 }
