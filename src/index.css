@@ -87,8 +87,9 @@
 .answers-button label{
   border: 1px solid black;
   border-radius: 20px;
-  background-color: #D6DBF5;
+  background-color: #FFFFFF;
   padding: 5px 20px;
+  cursor: pointer;
 }
 
 .answers-button h2{

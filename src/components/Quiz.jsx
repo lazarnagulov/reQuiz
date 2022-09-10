@@ -102,6 +102,13 @@ export default function Quiz() {
             __html: q.question
         }
 
+        function getStyle(id){
+            if(running) return {backgroundColor: form[index].answer == id ? "#D6DBF5" : "#FFFFFF"};
+            
+            if (form[index].correctAnswer == id) return {backgroundColor: "#94D7A2"};
+            if (form[index].answer == id) return {backgroundColor: "#F8BCBC"};
+        }
+
         return (
             <div key={nanoid()} className = "answers-button"> 
                 <h2 className="question" dangerouslySetInnerHTML={htmlText} />
@@ -113,7 +120,7 @@ export default function Quiz() {
                     value = {0}
                     checked = {form[index].answer == 0}
                 />
-                <label htmlFor={q.answers[0]} dangerouslySetInnerHTML={{__html: q.answers[0]}}></label>
+                <label htmlFor={q.answers[0]} dangerouslySetInnerHTML={{__html: q.answers[0]}} style = {getStyle(0)}></label>
                
                 <input
                     type="radio"
@@ -123,7 +130,7 @@ export default function Quiz() {
                     value = {1}
                     checked = {form[index].answer == 1}
                 />
-                <label htmlFor={q.answers[1]} dangerouslySetInnerHTML={{__html: q.answers[1]}} ></label>
+                <label htmlFor={q.answers[1]} dangerouslySetInnerHTML={{__html: q.answers[1]}} style = {getStyle(1)} ></label>
 
                 <input
                     type="radio"
@@ -133,7 +140,7 @@ export default function Quiz() {
                     onChange={handleChange}
                     checked = {form[index].answer == 2}
                 />
-                <label htmlFor={q.answers[2]} dangerouslySetInnerHTML={{__html: q.answers[2]}}></label>
+                <label htmlFor={q.answers[2]} dangerouslySetInnerHTML={{__html: q.answers[2]}} style = {getStyle(2)}></label>
 
                 <input
                     type="radio"
@@ -143,7 +150,7 @@ export default function Quiz() {
                     onChange={handleChange}
                     checked = {form[index].answer == 3}
                 />
-                <label htmlFor={q.answers[3]} dangerouslySetInnerHTML={{__html: q.answers[3]}}></label>
+                <label htmlFor={q.answers[3]} dangerouslySetInnerHTML={{__html: q.answers[3]}} style = {getStyle(3)}></label>
             </div>
         );
     });
