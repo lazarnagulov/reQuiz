@@ -4,11 +4,11 @@ import { nanoid } from "nanoid";
 export default function Quiz() {
 
     const [questions, setQuestions] = React.useState([]);
-    //TODO: Better id matching (current question -> name)
-    //      Answers styling
     const [form, setForm] = React.useState([]);
+    const [running, setRunning] = React.useState(true);
 
     React.useEffect(() => {
+        if(!running) return;
         async function getQuestions() {
             const result = await fetch("https://opentdb.com/api.php?amount=5&category=9&type=multiple");
             const data = await result.json();
@@ -38,7 +38,7 @@ export default function Quiz() {
                     answer: -1,
                     correctAnswer: answerID
                 });
-            })
+            });
 
             setQuestions(() => data.results.map(q => ({
                 question: q.question,
@@ -48,7 +48,7 @@ export default function Quiz() {
         }
 
         getQuestions();
-    }, [])
+    }, [running])
 
     function shuffleAnswers(answers) {
         for (let i = answers.length - 1; i > 0; i--) {
@@ -60,7 +60,8 @@ export default function Quiz() {
     }
 
     const handleChange = (event) => {
-        const { id, name } = event.target;
+        if(!running) return;
+        const { value, name } = event.target;
 
         setForm(prevForm => {
             let newForm = [];
@@ -68,26 +69,32 @@ export default function Quiz() {
                 item.question === name ? 
                 newForm.push({
                     ...item,
-                    answer: parseInt(id)
+                    answer: parseInt(value)
                 }):
                 newForm.push({
                     ...item,
-                }) 
-            })
+                }); 
+            });
             return newForm;
         })
+    }
+    
+    function countAnswers(){
+        let correctAnswers = 0;
+        form.forEach(q => {
+            if (q.answer === q.correctAnswer)
+                ++correctAnswers;
+        })
+        return correctAnswers;
     }
 
     const handleSubmit = (event) => {
         event.preventDefault();
+        setRunning(false);
+    }
 
-        let correctAnswers = 0;
-        form.forEach(q => {
-            if (q.answer = q.correctAnswer)
-                ++correctAnswers;
-        })
-
-        console.log(correctAnswers);
+    const reset = () => {
+        setRunning(true);
     }
 
     const mapQuestions = questions.map((q, index) => {
@@ -96,51 +103,61 @@ export default function Quiz() {
         }
 
         return (
-            <div key={nanoid()}>
+            <div key={nanoid()} className = "answers-button"> 
                 <h2 className="question" dangerouslySetInnerHTML={htmlText} />
                 <input
-                    type="radio"
-                    id = {0}
+                    type = "radio"
+                    id = {q.answers[0]}
                     name = {q.question}
                     onChange={handleChange}
+                    value = {0}
                     checked = {form[index].answer == 0}
                 />
-                <label htmlFor={q.question} dangerouslySetInnerHTML={{__html: q.answers[0]}}></label>
-
+                <label htmlFor={q.answers[0]} dangerouslySetInnerHTML={{__html: q.answers[0]}}></label>
+               
                 <input
                     type="radio"
-                    id={1}
+                    id={q.answers[1]}
                     name={q.question}
                     onChange={handleChange}
+                    value = {1}
                     checked = {form[index].answer == 1}
                 />
-                <label htmlFor={q.question} dangerouslySetInnerHTML={{__html: q.answers[1]}}></label>
+                <label htmlFor={q.answers[1]} dangerouslySetInnerHTML={{__html: q.answers[1]}} ></label>
 
                 <input
                     type="radio"
-                    id={2}
+                    id={q.answers[2]}
                     name={q.question}
+                    value = {2}
                     onChange={handleChange}
                     checked = {form[index].answer == 2}
                 />
-                <label htmlFor={q.question} dangerouslySetInnerHTML={{__html: q.answers[2]}}></label>
+                <label htmlFor={q.answers[2]} dangerouslySetInnerHTML={{__html: q.answers[2]}}></label>
 
                 <input
                     type="radio"
-                    id={3}
+                    id={q.answers[3]}
+                    value = {3}
                     name={q.question}
                     onChange={handleChange}
                     checked = {form[index].answer == 3}
                 />
-                <label htmlFor={q.question} dangerouslySetInnerHTML={{__html: q.answers[3]}}></label>
+                <label htmlFor={q.answers[3]} dangerouslySetInnerHTML={{__html: q.answers[3]}}></label>
             </div>
-        )
+        );
     });
 
     return (
         <form action="" onSubmit={handleSubmit} className="form">
             {mapQuestions}
-            <button>Submit</button>
+            {!running ? 
+                <div className = "reset">
+                    <p>You scored {countAnswers()} / {questions.length} correct answers!</p>
+                    <button className="reset-button" onClick = {reset}>Reset</button>
+                </div> :
+                <button className = "submit-button">Submit</button>
+            }
         </form>
     );
 }
